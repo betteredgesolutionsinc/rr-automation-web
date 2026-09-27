@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{margin:0;background:#eff7fb;color:#17344a;font:15px system-ui,Arial,sans-serif}
+    main{max-width:900px;margin:30px auto;padding:20px}
+    .card{background:white;border-radius:16px;padding:24px;box-shadow:0 5px 20px #bfd4e255;margin-bottom:18px}
+    h1{margin:0 0 8px}p{color:#536b79;line-height:1.5}label{display:block;margin:16px 0 5px;font-weight:600}
+    input,textarea,select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #b5cbd8;border-radius:9px;font:inherit}
+    textarea{min-height:76px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    button,.button{background:#167eaf;color:white;border:0;border-radius:9px;padding:12px 17px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}
+    button:disabled{opacity:.5}.results{max-height:240px;overflow:auto;border:1px solid #d7e5ee;border-radius:9px}
+    .choice{display:block;width:100%;text-align:left;background:white;color:#17344a;border-radius:0;border-bottom:1px solid #e5eef2}
+    .choice:hover,.choice.selected{background:#e5f4fb}.muted{color:#6c8190;font-size:13px}
+    .shiftChoices{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}.shift{background:#e5f4fb;color:#17344a;border:1px solid #9ccce3}
+    .shift.selected{background:#167eaf;color:white}.resultRow{padding:9px;border-bottom:1px solid #e5eef2}
+    .resultRow .choice{border:0;padding:7px}.resultRow .shift{font-size:13px;padding:7px 10px}
+    .error{color:#a42626}.success{color:#176a45}.selectedName{background:#e5f4fb;padding:12px;border-radius:9px}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><main>
+  <div class="card">
+    <h1>BESI Shift Assigner</h1>
+    <p>Search an employee, choose an available shift, and click <b>Process Today</b>. The shift hours will fill only today’s <b>TIME IN / TIME OUT</b> cells for that employee.</p>
+    <div id="loadState">Loading employee roster…</div>
+    <div id="app" hidden>
+      <label for="search">Search employee name or ID</label>
+      <input id="search" type="search" placeholder="Type a full or partial name" oninput="searchEmployees()" autocomplete="off">
+      <div id="results" class="results" hidden></div>
+      <p id="selection" class="selectedName">No employee selected</p>
+      <div id="availableShifts" class="shiftChoices" hidden></div>
+      <form id="shiftForm" onsubmit="submitShift(event)">
+        <p id="todayInfo" class="muted"></p>
+        <button id="save" type="submit">Process Today</button>
+      </form>
+    </div>
+    <p id="message" role="status"></p>
+  </div>
+</main>
+<script>
+  let employees=[],shifts=[],selected=null,chosenShift=null;
+  const $=id=>document.getElementById(id);
+  function safe(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  google.script.run.withSuccessHandler(data=>{
+    employees=data.employees;shifts=data.shifts;$('loadState').hidden=true;$('app').hidden=false;
+    $('todayInfo').textContent='Processing date: '+data.today+' · TK sheet: '+data.selectedSheet;
+    $('message').textContent=data.todayAvailable
+      ? `${employees.length} employees and ${shifts.length} available shifts loaded.`
+      : `No Time In/Out column exists for today (${data.today}) yet. Processing will be available when today’s date is on the TK.`;
+  }).withFailureHandler(err=>{
+    $('loadState').textContent='Could not load the roster.';
+    $('message').className='error';$('message').textContent=err.message||String(err);
+  }).getShiftAppData();
+  function searchEmployees(){
+    const query=$('search').value.trim().toUpperCase();
+    selected=null;chosenShift=null;$('selection').textContent='No employee selected';
+    $('availableShifts').hidden=true;
+    if(!query){$('results').hidden=true;return;}
+    const matches=employees.filter(e=>e.name.includes(query)||e.id.toUpperCase().includes(query)).slice(0,25);
+    const box=$('results');box.replaceChildren();box.hidden=false;
+    if(!matches.length){box.textContent='No matching employee';return;}
+    matches.forEach(person=>{
+      const row=document.createElement('div');row.className='resultRow';
+      const nameButton=document.createElement('button');nameButton.type='button';nameButton.className='choice';
+      nameButton.textContent=person.name+(person.id?' · ID '+person.id:'');
+      nameButton.onclick=()=>chooseEmployee(person);
+      row.appendChild(nameButton);
+      const choices=document.createElement('div');choices.className='shiftChoices';
+      shifts.forEach(shift=>{
+        const button=document.createElement('button');button.type='button';button.className='shift';
+        button.textContent=shift.name+' · '+shift.startTime+'–'+shift.endTime;
+        button.onclick=()=>{chooseEmployee(person);chooseShift(shift);};
+        choices.appendChild(button);
+      });
+      row.appendChild(choices);box.appendChild(row);
+    });
+  }
+  function chooseEmployee(person){
+    selected=person;chosenShift=null;$('search').value=person.name;
+    $('selection').textContent='Selected: '+person.name+(person.id?' · ID '+person.id:'');
+    $('results').hidden=true;showShifts();
+  }
+  function showShifts(){
+    const box=$('availableShifts');box.replaceChildren();box.hidden=false;
+    shifts.forEach(shift=>{
+      const button=document.createElement('button');button.type='button';button.className='shift'+(chosenShift?.id===shift.id?' selected':'');
+      button.textContent=shift.name+' · '+shift.startTime+'–'+shift.endTime;
+      button.onclick=()=>chooseShift(shift);box.appendChild(button);
+    });
+  }
+  function chooseShift(shift){chosenShift=shift;showShifts();
+    $('selection').textContent='Selected: '+selected.name+' · '+shift.name+' ('+shift.startTime+'–'+shift.endTime+')';}
+  function submitShift(event){
+    event.preventDefault();const msg=$('message');msg.className='';
+    if(!selected||!chosenShift){msg.className='error';msg.textContent='Select an employee and one of the available shifts first.';return;}
+    const input={employeeKey:selected.key,shiftId:chosenShift.id};
+    $('save').disabled=true;msg.textContent='Processing today’s shift…';
+    google.script.run.withSuccessHandler(result=>{
+      $('save').disabled=false;msg.className='success';
+      msg.innerHTML=`Saved ${safe(result.startTime)}–${safe(result.endTime)} for ${safe(result.employee)} on ${safe(result.date)}. `+
+        `<a href="${safe(result.url)}" target="_blank" rel="noopener">Open TK</a>`;
+    }).withFailureHandler(err=>{
+      $('save').disabled=false;msg.className='error';msg.textContent=err.message||String(err);
+    }).processShift(input);
+  }
+</script></body></html>
