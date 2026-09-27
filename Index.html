@@ -1,109 +1,156 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body{margin:0;background:#eff7fb;color:#17344a;font:15px system-ui,Arial,sans-serif}
-    main{max-width:900px;margin:30px auto;padding:20px}
-    .card{background:white;border-radius:16px;padding:24px;box-shadow:0 5px 20px #bfd4e255;margin-bottom:18px}
-    h1{margin:0 0 8px}p{color:#536b79;line-height:1.5}label{display:block;margin:16px 0 5px;font-weight:600}
-    input,textarea,select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #b5cbd8;border-radius:9px;font:inherit}
-    textarea{min-height:76px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    button,.button{background:#167eaf;color:white;border:0;border-radius:9px;padding:12px 17px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}
-    button:disabled{opacity:.5}.results{max-height:240px;overflow:auto;border:1px solid #d7e5ee;border-radius:9px}
-    .choice{display:block;width:100%;text-align:left;background:white;color:#17344a;border-radius:0;border-bottom:1px solid #e5eef2}
-    .choice:hover,.choice.selected{background:#e5f4fb}.muted{color:#6c8190;font-size:13px}
-    .shiftChoices{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}.shift{background:#e5f4fb;color:#17344a;border:1px solid #9ccce3}
-    .shift.selected{background:#167eaf;color:white}.resultRow{padding:9px;border-bottom:1px solid #e5eef2}
-    .resultRow .choice{border:0;padding:7px}.resultRow .shift{font-size:13px;padding:7px 10px}
-    .error{color:#a42626}.success{color:#176a45}.selectedName{background:#e5f4fb;padding:12px;border-radius:9px}
-    @media(max-width:650px){.grid{grid-template-columns:1fr}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RR Automation & Web | Websites and business workflows</title>
+<meta name="description" content="Websites, internal tools and workflow automation for businesses. Built by RR Montoya.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b2535'/%3E%3Cpath d='M15 43V21h14c11 0 11 13 2 15l8 7M15 34h14M39 43V21h10' fill='none' stroke='%237ee3cc' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:light;--ink:#0b2535;--muted:#4e6270;--mint:#7ee3cc;--line:#d5e3e8;--paper:#f5f9fa}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:inherit}
+a:focus-visible{outline:3px solid #008b78;outline-offset:4px}
+header{background:#0b2535;color:#fff}
+.nav{max-width:1160px;margin:auto;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.brand{font-weight:800;letter-spacing:.02em;text-decoration:none;font-size:1.1rem}
+.brand span{color:var(--mint)}
+nav{display:flex;gap:26px}
+nav a{text-decoration:none;color:#dce9eb;font-size:.95rem}
+nav a:hover{color:var(--mint)}
+.hero{max-width:1160px;margin:auto;min-height:580px;padding:82px 28px 92px;display:grid;grid-template-columns:1.35fr .65fr;gap:60px;align-items:center}
+.eyebrow{font-size:.85rem;text-transform:uppercase;letter-spacing:.14em;color:var(--mint);font-weight:800}
+.hero h1{font-size:clamp(2.65rem,6vw,5.6rem);line-height:1.06;letter-spacing:-.055em;max-width:800px;margin:16px 0 22px}
+.hero p{font-size:1.2rem;max-width:620px;color:#cfdee2;margin:0 0 32px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.button{display:inline-block;background:var(--mint);color:var(--ink);border-radius:8px;padding:13px 20px;text-decoration:none;font-weight:800}
+.button.secondary{background:transparent;border:1px solid #7395a0;color:#fff}
+.visual{border:1px solid #466777;border-radius:20px;background:#143447;padding:28px;box-shadow:18px 18px 0 #173a48}
+.visual .bar{display:flex;gap:7px;margin-bottom:25px}
+.visual .bar i{width:8px;height:8px;border-radius:50%;background:#7ee3cc;opacity:.7}
+.visual .row{padding:14px 16px;margin:10px 0;border-radius:9px;background:#21495b;color:#e6f4f2;font-size:.95rem}
+.visual .row:last-child{background:#286b67}
+.visual small{display:block;color:#acd0d2;margin-bottom:5px}
+.section{max-width:1160px;margin:auto;padding:88px 28px}
+.section h2{font-size:clamp(2rem,4vw,3.35rem);letter-spacing:-.04em;line-height:1.13;margin:0 0 18px}
+.intro{max-width:680px;color:var(--muted);font-size:1.1rem;margin:0 0 38px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px;min-height:255px}
+.card b{display:block;color:#087b70;font-size:.82rem;letter-spacing:.12em;margin-bottom:30px}
+.card h3{font-size:1.55rem;line-height:1.2;margin:0 0 12px}
+.card p{color:var(--muted);margin:0}
+.band{background:#dcefeb}
+.band .section{display:grid;grid-template-columns:1fr 1fr;gap:70px}
+.steps{counter-reset:s}
+.step{border-top:1px solid #9ebfbd;padding:19px 0;display:grid;grid-template-columns:44px 1fr;gap:14px}
+.step:before{counter-increment:s;content:'0' counter(s);font-weight:800;color:#087b70}
+.step h3{margin:0 0 4px}
+.step p{margin:0;color:var(--muted)}
+.contact{background:#0b2535;color:#fff}
+.contact .section{padding-top:85px;padding-bottom:85px}
+.contact p{color:#cbdbdf;max-width:650px}
+.contact a.email{font-size:clamp(1.2rem,3vw,2rem);color:var(--mint);font-weight:750;overflow-wrap:anywhere}
+footer{background:#071c28;color:#a9bdc4;padding:22px 28px;text-align:center;font-size:.9rem}
+@media(max-width:760px){
+  .nav{align-items:flex-start}
+  .nav nav{gap:12px;flex-wrap:wrap;justify-content:flex-end}
+  .hero{grid-template-columns:1fr;min-height:auto;padding-top:65px}
+  .visual{max-width:480px;box-shadow:10px 10px 0 #173a48}
+  .cards,.band .section{grid-template-columns:1fr}
+  .band .section{gap:20px}
+}
+@media(max-width:430px){
+  .nav{display:block}
+  .nav nav{justify-content:flex-start;margin-top:12px}
+  .hero,.section{padding-left:20px;padding-right:20px}
+}
+</style>
 </head>
-<body><main>
-  <div class="card">
-    <h1>BESI Shift Assigner</h1>
-    <p>Search an employee, choose an available shift, and click <b>Process Today</b>. The shift hours will fill only today’s <b>TIME IN / TIME OUT</b> cells for that employee.</p>
-    <div id="loadState">Loading employee roster…</div>
-    <div id="app" hidden>
-      <label for="search">Search employee name or ID</label>
-      <input id="search" type="search" placeholder="Type a full or partial name" oninput="searchEmployees()" autocomplete="off">
-      <div id="results" class="results" hidden></div>
-      <p id="selection" class="selectedName">No employee selected</p>
-      <div id="availableShifts" class="shiftChoices" hidden></div>
-      <form id="shiftForm" onsubmit="submitShift(event)">
-        <p id="todayInfo" class="muted"></p>
-        <button id="save" type="submit">Process Today</button>
-      </form>
-    </div>
-    <p id="message" role="status"></p>
+<body>
+<header>
+  <div class="nav">
+    <a class="brand" href="#top">RR <span>Automation & Web</span></a>
+    <nav aria-label="Main navigation">
+      <a href="#services">Services</a>
+      <a href="#approach">Approach</a>
+      <a href="#contact">Contact</a>
+    </nav>
   </div>
+
+  <div class="hero" id="top">
+    <div>
+      <div class="eyebrow">Built for the way your business works</div>
+      <h1>Websites that make a first impression. Systems that make work easier.</h1>
+      <p>I build business websites, internal web apps, and automations that turn repeated manual steps into clear, useful workflows.</p>
+      <div class="actions">
+        <a class="button" href="mailto:martinezarar742@gmail.com?subject=Project%20inquiry">Discuss a project</a>
+        <a class="button secondary" href="#services">Explore services</a>
+      </div>
+    </div>
+    <div class="visual" aria-label="Example workflow: form, records, dashboard">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="row"><small>01 / Capture</small>Forms and inputs</div>
+      <div class="row"><small>02 / Connect</small>Organized records</div>
+      <div class="row"><small>03 / Understand</small>Useful dashboards</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section" id="services">
+    <div class="eyebrow" style="color:#087b70">What I can build</div>
+    <h2>Useful digital tools, shaped around your process.</h2>
+    <p class="intro">Start with what your team or customers need to do. Then build the simplest experience that helps them do it well.</p>
+    <div class="cards">
+      <article class="card">
+        <b>01 / WEB PRESENCE</b>
+        <h3>Business websites</h3>
+        <p>Clear, responsive websites and landing pages that explain your services and give customers an easy way to reach you.</p>
+      </article>
+      <article class="card">
+        <b>02 / OPERATIONS</b>
+        <h3>Workflow automation</h3>
+        <p>Automated forms, spreadsheet processes, notifications, and recurring tasks that reduce manual entry.</p>
+      </article>
+      <article class="card">
+        <b>03 / INTERNAL TOOLS</b>
+        <h3>Web apps and portals</h3>
+        <p>Simple interfaces for staff and managers to submit information, review records, and follow a shared process.</p>
+      </article>
+      <article class="card">
+        <b>04 / VISIBILITY</b>
+        <h3>Dashboards and reporting</h3>
+        <p>Organized views that make daily activity and key figures easier to check and act on.</p>
+      </article>
+    </div>
+  </section>
+
+  <div class="band">
+    <section class="section" id="approach">
+      <div>
+        <div class="eyebrow" style="color:#087b70">How I work</div>
+        <h2>Begin with the actual work, not a list of features.</h2>
+        <p class="intro">I learn the steps you follow today, identify what slows them down, and build around the people who will use the result.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div><h3>Map the process</h3><p>Define who uses the tool, what they need, and where information goes.</p></div></div>
+        <div class="step"><div><h3>Build a working version</h3><p>Make the main flow usable first, then refine the details.</p></div></div>
+        <div class="step"><div><h3>Test and improve</h3><p>Check the real workflow and adjust what gets in the way.</p></div></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="contact" id="contact">
+    <div class="section">
+      <div class="eyebrow">Let’s talk</div>
+      <h2>Tell me what you want your website or workflow to do.</h2>
+      <p>Share your current process, the problem you want to solve, or a website you have in mind. I’ll help define a practical starting point.</p>
+      <a class="email" href="mailto:martinezarar742@gmail.com?subject=Website%20or%20automation%20project">martinezarar742@gmail.com</a>
+    </div>
+  </section>
 </main>
-<script>
-  let employees=[],shifts=[],selected=null,chosenShift=null;
-  const $=id=>document.getElementById(id);
-  function safe(value){return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-  google.script.run.withSuccessHandler(data=>{
-    employees=data.employees;shifts=data.shifts;$('loadState').hidden=true;$('app').hidden=false;
-    $('todayInfo').textContent='Processing date: '+data.today+' · TK sheet: '+data.selectedSheet;
-    $('message').textContent=data.todayAvailable
-      ? `${employees.length} employees and ${shifts.length} available shifts loaded.`
-      : `No Time In/Out column exists for today (${data.today}) yet. Processing will be available when today’s date is on the TK.`;
-  }).withFailureHandler(err=>{
-    $('loadState').textContent='Could not load the roster.';
-    $('message').className='error';$('message').textContent=err.message||String(err);
-  }).getShiftAppData();
-  function searchEmployees(){
-    const query=$('search').value.trim().toUpperCase();
-    selected=null;chosenShift=null;$('selection').textContent='No employee selected';
-    $('availableShifts').hidden=true;
-    if(!query){$('results').hidden=true;return;}
-    const matches=employees.filter(e=>e.name.includes(query)||e.id.toUpperCase().includes(query)).slice(0,25);
-    const box=$('results');box.replaceChildren();box.hidden=false;
-    if(!matches.length){box.textContent='No matching employee';return;}
-    matches.forEach(person=>{
-      const row=document.createElement('div');row.className='resultRow';
-      const nameButton=document.createElement('button');nameButton.type='button';nameButton.className='choice';
-      nameButton.textContent=person.name+(person.id?' · ID '+person.id:'');
-      nameButton.onclick=()=>chooseEmployee(person);
-      row.appendChild(nameButton);
-      const choices=document.createElement('div');choices.className='shiftChoices';
-      shifts.forEach(shift=>{
-        const button=document.createElement('button');button.type='button';button.className='shift';
-        button.textContent=shift.name+' · '+shift.startTime+'–'+shift.endTime;
-        button.onclick=()=>{chooseEmployee(person);chooseShift(shift);};
-        choices.appendChild(button);
-      });
-      row.appendChild(choices);box.appendChild(row);
-    });
-  }
-  function chooseEmployee(person){
-    selected=person;chosenShift=null;$('search').value=person.name;
-    $('selection').textContent='Selected: '+person.name+(person.id?' · ID '+person.id:'');
-    $('results').hidden=true;showShifts();
-  }
-  function showShifts(){
-    const box=$('availableShifts');box.replaceChildren();box.hidden=false;
-    shifts.forEach(shift=>{
-      const button=document.createElement('button');button.type='button';button.className='shift'+(chosenShift?.id===shift.id?' selected':'');
-      button.textContent=shift.name+' · '+shift.startTime+'–'+shift.endTime;
-      button.onclick=()=>chooseShift(shift);box.appendChild(button);
-    });
-  }
-  function chooseShift(shift){chosenShift=shift;showShifts();
-    $('selection').textContent='Selected: '+selected.name+' · '+shift.name+' ('+shift.startTime+'–'+shift.endTime+')';}
-  function submitShift(event){
-    event.preventDefault();const msg=$('message');msg.className='';
-    if(!selected||!chosenShift){msg.className='error';msg.textContent='Select an employee and one of the available shifts first.';return;}
-    const input={employeeKey:selected.key,shiftId:chosenShift.id};
-    $('save').disabled=true;msg.textContent='Processing today’s shift…';
-    google.script.run.withSuccessHandler(result=>{
-      $('save').disabled=false;msg.className='success';
-      msg.innerHTML=`Saved ${safe(result.startTime)}–${safe(result.endTime)} for ${safe(result.employee)} on ${safe(result.date)}. `+
-        `<a href="${safe(result.url)}" target="_blank" rel="noopener">Open TK</a>`;
-    }).withFailureHandler(err=>{
-      $('save').disabled=false;msg.className='error';msg.textContent=err.message||String(err);
-    }).processShift(input);
-  }
-</script></body></html>
+<footer>© 2026 RR Automation & Web · Built by RR Montoya</footer>
+</body>
+</html>
